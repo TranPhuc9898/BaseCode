@@ -1,0 +1,57 @@
+{
+  "testRunner": "jest",
+  "runnerConfig": "e2e/config.json",
+  "skipLegacyWorkersInjection": true,
+  "apps": {
+    "ios": {
+      "build": "xcodebuild -workspace ios/RNMail.xcworkspace -scheme RNMail -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+      "type": "ios.app",
+      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/RNMail.app"
+    },
+    "android": {
+      "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+      "type": "android.apk",
+      "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+    },
+    "driver.ios.release": {
+      "type": "ios.app",
+      "name": "driver",
+      "binaryPath": "path/to/driver.app"
+    },
+    "passenger.ios.release": {
+      "type": "ios.app",
+      "name": "passenger",
+      "binaryPath": "path/to/passenger.app"
+    }
+  },
+
+  "devices": {
+    "simulator": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPhone 13"
+      }
+    },
+    "emulator": {
+      "type": "android.emulator",
+      "device": {
+        "avdName": "Pixel_4_API_32"
+      }
+    }
+  },
+  "configurations": {
+    "ios.release": {
+      "device": "simulator",
+      "apps": ["driver", "passenger"]
+    },
+    "ios": {
+      "device": "simulator",
+      "app": "ios"
+    },
+    "android": {
+      "device": "emulator",
+      "app": "android"
+    }
+  }
+}
