@@ -26,7 +26,7 @@ export const BottomMenuItem = ({ Name, isCurrent, iconNumber }: Props) => {
         {
           <Icon
             name={iconNumber}
-            fill={isCurrent ? bTaskee : '#000'}
+            fill={isCurrent ? bTaskee : '#fff'}
             width={25}
             height={25}
           />
@@ -35,7 +35,7 @@ export const BottomMenuItem = ({ Name, isCurrent, iconNumber }: Props) => {
       <View style={{}}>
         <Text
           style={{
-            color: isCurrent ? bTaskee : '#50555C',
+            color: isCurrent ? bTaskee : '#fff',
             textAlign: 'center'
           }}
         >

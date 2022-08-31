@@ -118,14 +118,14 @@ export const TabBar = ({
 
 const style = StyleSheet.create({
   tabContainer: {
-    height: 70,
+    height: 100,
     shadowOffset: {
       width: 0,
       height: -1
     },
     shadowOpacity: 0.1,
     shadowRadius: 4.0,
-    backgroundColor: 'white',
+    backgroundColor: '#000',
     elevation: 10,
     bottom: 0
   },

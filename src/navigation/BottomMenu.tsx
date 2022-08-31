@@ -36,9 +36,9 @@ export const BottomMenu = () => {
         name="HomeScreen"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Trang chủ',
+          tabBarLabel: 'Calculator',
           headerShown: false,
-          tabBarTestID: 'HomeScreen'
+          tabBarTestID: 'Calculator'
         }}
       />
 
@@ -46,9 +46,9 @@ export const BottomMenu = () => {
         name={'DetailScreen'}
         component={DetailScreen}
         options={{
-          tabBarLabel: 'Công việc',
+          tabBarLabel: 'Currency Converter',
           headerShown: false,
-          tabBarTestID: 'DetailScreen'
+          tabBarTestID: 'Currency Converter'
         }}
       />
 
@@ -56,11 +56,11 @@ export const BottomMenu = () => {
         name="AccountScreen"
         component={AccountScreen}
         options={{
-          tabBarLabel: 'Tài khoản',
+          tabBarLabel: 'Feedback',
 
           tabBarBadge: 3,
           headerShown: false,
-          tabBarTestID: 'AccountScreen'
+          tabBarTestID: 'Feedback'
         }}
       />
       {/* <Tab.Screen
