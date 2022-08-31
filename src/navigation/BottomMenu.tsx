@@ -63,7 +63,7 @@ export const BottomMenu = () => {
           tabBarTestID: 'AccountScreen'
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="SupportScreen"
         component={SupportScreen}
         options={{
@@ -71,7 +71,7 @@ export const BottomMenu = () => {
           headerShown: false,
           tabBarTestID: 'SupportScreen'
         }}
-      />
+      /> */}
     </Tab.Navigator>
   )
 }
