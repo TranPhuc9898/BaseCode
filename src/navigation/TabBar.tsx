@@ -45,7 +45,8 @@ export const TabBar = ({
             style.slider,
             {
               transform: [{ translateX: translateValue }],
-              width: tabWidth - 20
+              width: tabWidth - 15,
+              height: 2
             }
           ]}
         />

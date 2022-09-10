@@ -7,7 +7,7 @@ import { TabBar } from './TabBar'
 
 import DetailScreen from '../screens/detail'
 import AccountScreen from '../screens/account'
-import SupportScreen from '../screens/support'
+// import SupportScreen from '../screens/support'
 import CleanHouseScreen from '../screens/clean'
 
 //
@@ -63,38 +63,10 @@ export const BottomMenu = () => {
           tabBarTestID: 'Feedback'
         }}
       />
-      {/* <Tab.Screen
-        name="SupportScreen"
-        component={SupportScreen}
-        options={{
-          tabBarLabel: 'Hỗ trợ',
-          headerShown: false,
-          tabBarTestID: 'SupportScreen'
-        }}
-      /> */}
     </Tab.Navigator>
   )
 }
-// Another Stack Screen
 
-// export type AnotherStackParams = {
-//   CleanHouseScreen: undefined
-// }
-// const AnotherStackParamsNavigator = createStackNavigator<AnotherStackParams>()
-
-// const AnotherStackNavigator = () => (
-//   <AnotherStackParamsNavigator.Navigator
-//     screenOptions={{
-//       headerShown: false
-//     }}
-//   >
-//     <AnotherStackParamsNavigator.Screen
-//       name="CleanHouseScreen"
-//       component={CleanHouseScreen}
-//     />
-//   </AnotherStackParamsNavigator.Navigator>
-// )
-//
 export type RootStackParams = {
   BottomMenu: undefined
 

@@ -1,281 +1,210 @@
-import { bTaskee } from '@/themes/color'
-import { IData } from '@/utils/types'
-
-import React, { useEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import {
   Dimensions,
-  FlatList,
-  Image,
-  ScrollView,
   StyleSheet,
-  Text,
   View,
-  TouchableOpacity,
-  LogBox
+  LogBox,
+  TouchableOpacity
 } from 'react-native'
-import FastImage from 'react-native-fast-image'
 
 import Header from '../components/header/header'
-import { LIST_DATA, LIST_DATA2 } from '../utils/data'
 
 import { DrawerContentComponentProps } from '@react-navigation/drawer'
-import { IData2 } from '../utils/types'
+import {
+  IItem,
+  IRecordCalculator,
+  IRecordCurrency,
+  IResult,
+  TCalcStatus
+} from '@/configs/custom-types'
+import {
+  getFormulaAndResultText,
+  getFormulaText,
+  getResultText,
+  initialFormula,
+  initialResult
+} from '@/helpers'
+import Calculator from '@/components/caculator/Caculator'
+import moment from 'moment-timezone'
+
+import { IconButton } from 'react-native-paper'
+import FormText from '@/components/fromText/FormText'
 
 const { width, height } = Dimensions.get('window')
+
 const HomeScreen: React.FC<DrawerContentComponentProps> = ({ navigation }) => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested'])
   }, [])
-  const onPress = () => {
-    navigation.navigate('AccountScreen')
-  }
-  const _renderItem = ({ item, index }: { item: IData; index: number }) => {
-    return (
-      <View style={styles.renderItemView}>
-        <View style={{ alignItems: 'center' }}>
-          <Image
-            source={require('../assets/icon/images.jpeg')}
-            style={{ width: 20, height: 20 }}
-          />
-        </View>
 
-        <View style={{ margin: 5 }}>
-          <Text style={{}}>{item.nameData}</Text>
-        </View>
-      </View>
-    )
+  const [latestRecord, setLatestRecord] = useState<IRecordCalculator | null>(
+    null
+  )
+
+  const [formula, setFormula] = useState(initialFormula)
+  const [result, setResult] = useState(initialResult)
+  const [status, setStatus] = useState('start')
+
+  const calculatorRef = useRef<any>(null)
+
+  const loadRecord = (newRecord: IRecordCalculator | IRecordCurrency) => {
+    const calcRecord = newRecord as IRecordCalculator
+
+    setFormula(calcRecord.formula)
+    setResult(calcRecord.result)
+    setStatus('calculated')
+
+    if (calculatorRef.current)
+      calculatorRef.current.initCalculator(
+        calcRecord.formula,
+        calcRecord.result,
+        'calculated'
+      )
   }
 
-  const _renderItem2 = ({ item, index }: { item: IData2; index: number }) => {
-    return (
-      <View style={styles.renderItemView}>
-        <View style={{ alignItems: 'center' }}>
-          <Image
-            source={require('../assets/icon/images.jpeg')}
-            style={{ width: 20, height: 20, marginTop: 4 }}
-          />
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ margin: 5 }}>
-            <Text style={styles.text}>{item.nameData}</Text>
-          </View>
-          <View>
-            <Text>{item.nameSup}</Text>
-          </View>
-        </View>
-      </View>
-    )
-  }
-  const image =
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCSmz2mNKmV-x3_cXKE9Qn8l8VkNOzbAy5nQ&usqp=CAU'
+  // useEffect(() => {
+  //     const newRecord = CustomStorage.History.getAt('calculator', 0) as IRecordCalculator | null;
+  //     setLatestRecord(newRecord);
+  // }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      <Header nameHeader="bTaskee" />
-
-      <ScrollView style={styles.container}>
-        <View>
-          <Text style={styles.text}>Dịch vụ</Text>
-        </View>
-        {/* // View Header \\ */}
-        <View style={styles.image}>
-          <View style={{ marginTop: 15 }}>
-            <FastImage
-              style={{ width: width - 40, height: 150 }}
-              source={{
-                uri: image,
-                headers: { Authorization: 'someAuthToken' },
-                priority: FastImage.priority.normal
-              }}
-              resizeMode={FastImage.resizeMode.cover}
-            />
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#fff',
-              shadowColor: bTaskee,
-              paddingVertical: 'auto',
-              borderRadius: 1,
-              shadowOpacity: 2,
-              shadowRadius: 2,
-              shadowOffset: {
-                height: 0.3,
-                width: 0.3
-              },
-              borderRightColor: bTaskee,
-              borderEndColor: bTaskee,
-              padding: 20
-            }}
-          >
-            <View>
-              <Image
-                source={require('../assets/icon/images.jpeg')}
-                style={{ width: 35, height: 35, borderRadius: 10 }}
-              />
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: width - 120,
-                alignItems: 'center',
-                marginLeft: 5
-              }}
-            >
-              <View>
-                <Text style={styles.text}>Dọn dẹp nhà</Text>
-              </View>
-              <View
-                style={{
-                  backgroundColor: bTaskee,
-                  borderRadius: 7,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderColor: '#fff'
+      <Header nameHeader="STDIO" />
+      <View style={styles.container}>
+        <View style={styles.containerBox}>
+          <View style={styles.actionContainer}>
+            {latestRecord !== null && (
+              <TouchableOpacity
+                onPress={() => {
+                  loadRecord(latestRecord)
                 }}
+                style={{ flex: 1, overflow: 'hidden' }}
               >
-                <TouchableOpacity testID="btnDangViec"
-                  onPress={() => {
-                    navigation.navigate('CleanHouseScreen')
-                  }}
-                >
-                  <Text style={{ color: '#fff' }}>Đăng việc ngay</Text>
+                <FormText style={styles.latestFormula} numberOfLines={1}>
+                  {getFormulaText(latestRecord.formula)}
+                </FormText>
+                <FormText style={styles.latestResult}>
+                  {getResultText(latestRecord.result)}
+                </FormText>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={styles.screenContainer}>
+            <View style={styles.formulaContainer}>
+              <View style={styles.formulaContainerBaseLine}>
+                <TouchableOpacity onPress={() => {}}>
+                  <FormText style={styles.formulaText}>
+                    {status === 'calculated'
+                      ? getFormulaAndResultText(formula, result)
+                      : getFormulaText(formula)}
+                  </FormText>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </View>
-        {/* // View next \\ */}
-
-        <View style={{ paddingTop: 20 }}>
-          <Text style={styles.text}>Các dịch vụ bTaskee cung cấp</Text>
-          <View
-            style={{
-              marginTop: 20,
-              paddingVertical: 160,
-              borderRadius: 10,
-              backgroundColor: '#fff',
-              shadowColor: bTaskee,
-              shadowOpacity: 4,
-              shadowRadius: 2,
-              shadowOffset: {
-                height: 0.5,
-                width: 0.3
-              },
-              borderRightColor: bTaskee,
-              borderEndColor: bTaskee
-            }}
-          >
-            <View style={{ position: 'absolute', zIndex: 999 }}>
-              <FlatList
-                data={LIST_DATA}
-                renderItem={_renderItem}
-                keyExtractor={(item, index) => `${item.toString()}-${index}`}
-              />
+            <View style={styles.resultContainer}>
+              <TouchableOpacity onPress={() => {}}>
+                <FormText style={styles.resultText}>
+                  {getResultText(result)}
+                </FormText>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
+          <View style={styles.controlContainer}>
+            <Calculator
+              type="calculator"
+              ref={calculatorRef}
+              onChangeFormula={(newFormula: IItem[]) => {
+                setFormula([...newFormula])
+              }}
+              onChangeResult={(newResult: IResult) => {
+                setResult(newResult)
+              }}
+              onChangeStatus={(newStatus: TCalcStatus) => {
+                setStatus(newStatus)
+              }}
+              // onRecord={async (newFormula: IItem[], newResult: IResult) => {
+              //   const newRecord: IRecordCalculator = {
+              //     formula: newFormula,
+              //     result: newResult,
+              //     timestamp: moment().unix()
+              //   }
 
-        {/* // View Third \\ */}
-        <View style={{ paddingTop: 20 }}>
-          <Text style={styles.text}>Các tình năng trên app bTaskee</Text>
-          <View style={styles.viewBox}>
-            <FlatList
-              data={LIST_DATA2}
-              renderItem={_renderItem2}
-              keyExtractor={(item, index) => `${item.toString()}-${index}`}
+              //   // await CustomStorage.History.updateOrInsert(recordType, newRecord);
+              //   setLatestRecord(newRecord)
+
+              //   // askForRate();
+              // }}
             />
           </View>
         </View>
-        {/* // View Four \\ */}
-
-        <View style={{ paddingTop: 20 }}>
-          <Text style={styles.text}>
-            Để có một trải nghiệm đầy đủ hơn. Vui lòng tải app bTaskee!
-          </Text>
-          <View style={{ paddingTop: 5 }}>
-            <Text>*Nhấn vào đây để xem hướng dẫn tải và sử dụng app.</Text>
-          </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingTop: 5
-            }}
-          >
-            <TouchableOpacity style={styles.button} onPress={onPress}>
-              <Text style={{ fontSize: 12, color: '#fff' }}>HƯỚNG DẪN</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+      </View>
     </View>
   )
 }
-
+export default HomeScreen
 const styles = StyleSheet.create({
-  body: {
-    width: width,
-    height: height
-  },
-  bodySer: {
-    marginLeft: 19,
-    marginTop: 8
-  },
-  bodyTitle: {},
-  text: {
-    fontWeight: 'bold',
-    fontSize: 14
-  },
-  secondBody: {
-    width: width * 0.9,
-    height: height / 3.5,
-    backgroundColor: '#000',
-    paddingTop: 25
-  },
-  hello: {
-    borderRadius: 15,
-    marginTop: 15,
-    marginRight: 15,
-    backgroundColor: '#fff'
-  },
   container: {
-    margin: 20
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#000'
   },
-  image: {
-    flexDirection: 'column'
+  containerBox: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#000'
   },
-  button: {
-    backgroundColor: bTaskee,
-    borderRadius: 50,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#fff',
-    width: 100
-  },
-  renderItemView: {
+  actionContainer: {
     flexDirection: 'row',
-    marginTop: 2,
-    marginLeft: 6
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 10
   },
-  viewBox: {
-    marginTop: 20,
-    paddingVertical: 'auto',
-    borderRadius: 10,
-    backgroundColor: '#fff',
-    shadowColor: bTaskee,
-    shadowOpacity: 4,
-    shadowRadius: 2,
-    shadowOffset: {
-      height: 0.5,
-      width: 0.3
-    },
-    borderRightColor: bTaskee,
-    borderEndColor: bTaskee
+  latestFormula: {
+    width: '100%',
+    textAlign: 'right',
+    fontSize: 14,
+    color: '#fff'
+  },
+  latestResult: {
+    width: '100%',
+    textAlign: 'right',
+    fontSize: 16,
+    color: '#fff'
+  },
+  screenContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+  },
+  formulaContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+    justifyContent: 'flex-end',
+    alignItems: 'baseline'
+  },
+  formulaContainerBaseLine: {
+    backgroundColor: '#000',
+    padding: 10,
+    alignSelf: 'flex-end'
+  },
+  formulaText: {
+    color: '#fff',
+    fontSize: 28,
+    textAlign: 'right'
+  },
+  resultContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    padding: 10
+  },
+  resultText: {
+    color: '#fff',
+    fontSize: 36
+  },
+  controlContainer: {
+    flex: 0,
+    alignSelf: 'flex-end'
   }
 })
-
-export default HomeScreen
