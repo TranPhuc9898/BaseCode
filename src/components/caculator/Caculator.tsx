@@ -85,6 +85,11 @@ const Calculator: ForwardRefRenderFunction<unknown, IProps> = (
       let newResult: IResult = initialResult
 
       const newItemValues = newFormula.map((item: IItem) => item.value)
+      console.log(
+        '%c [ newItemValues ]-88',
+        'font-size:13px; background:pink; color:#bf2c9f;',
+        newItemValues
+      )
 
       try {
         newResult = {

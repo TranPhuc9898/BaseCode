@@ -240,6 +240,7 @@ export const commaNumberC = (value: number | string) => {
 
 export const getFormulaText = (items: IItem[]): string => {
   let formulaText = ''
+  console.log(formulaText, 'formulaText12345')
 
   for (let i = items.length - 1; i >= 0; i--) {
     if (items[i].type === 'number')
