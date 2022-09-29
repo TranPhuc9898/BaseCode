@@ -1,227 +1,83 @@
-import { Text } from '@/atoms'
-
 import * as React from 'react'
-import { memo } from 'react'
-import { View, StyleSheet, Pressable, Alert } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 
 //
 import Header from '../components/header/header'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/redux/store'
-import { black, bTaskee, grey } from '@/themes/color'
-import { Icon } from 'react-native-eva-icons'
-import { currencyFormat, formatLetter } from '@/helpers'
-import { LIST_DATA3 } from '@/utils/data'
-import moment from 'moment'
+import { black, bTaskee } from '@/themes/color'
 
-const DetailScreen = () => {
-  const infoSlice = useSelector((state: RootState) => state.infoSlice)
-  const mutiSlice = useSelector((state: RootState) => state.mutiSlice)
-  const choiceSlice = useSelector((state: RootState) => state.choiceSlice)
-  const timeSlice = useSelector((state: RootState) => state.timeSlice)
-  const momentSlice = useSelector((state: RootState) => state.momentSlice)
-  const current = moment.unix(momentSlice.timeData ?? 0)
+import Calculator from '@/components/caculator/Caculator'
+import { useRef, useState } from 'react'
+import { ICurrency, IRecordCurrency } from '@/configs/custom-types'
+import { initialFormula, initialResult } from '@/helpers'
+import { CurrencyAPI } from '@/utils/api/api'
+import { CustomStorage } from '@/utils/api/customeStorage'
+
+type TLoadStatus = 'loading' | 'fail' | 'success'
+
+const initialCurrencies: ICurrency[] = [
+  {
+    code: 'USD',
+    currency: '',
+    rate: 1,
+    icon: ''
+  }
+]
+
+const CurrencyScreen = () => {
+  const [latestRecord, setLatestRecord] = useState<IRecordCurrency | null>(null)
+
+  const [loadStatus, setLoadStatus] = useState<TLoadStatus>('loading')
+
+  const [formula, setFormula] = useState(initialFormula)
+  const [result, setResult] = useState(initialResult)
+  const [status, setStatus] = useState('start')
+
+  const [srcResult, setSrcResult] = useState(initialResult)
+  const [desResult, setDesResult] = useState(initialResult)
+
+  const [currencies, setCurrencies] = useState<ICurrency[]>(initialCurrencies)
+  const [srcCurrency, setSrcCurrency] = useState<ICurrency>(
+    initialCurrencies[0]
+  )
+  const [desCurrency, setDesCurrency] = useState<ICurrency>(
+    initialCurrencies[0]
+  )
+
+  const calculatorRef = useRef<any>(null)
+
+  const getCurrencies = async () => {
+    CurrencyAPI.getCurrencies()
+      .then(async resp => {
+        const newCurrencies = resp.data
+        setCurrencies(newCurrencies)
+        const srcCode = CustomStorage.CurrencyCode.get('srcCode')
+        if (srcCode !== null)
+          setSrcCurrency(getCurrencyByCode(newCurrencies, srcCode))
+        else {
+          setSrcCurrency(newCurrencies[0])
+          await CustomStorage.CurrencyCode.set('srcCode', newCurrencies[0].code)
+        }
+        const desCode = CustomStorage.CurrencyCode.get('desCode')
+        if (desCode !== null)
+          setDesCurrency(getCurrencyByCode(newCurrencies, desCode))
+        else {
+          setDesCurrency(newCurrencies[0])
+          await CustomStorage.CurrencyCode.set('desCode', newCurrencies[0].code)
+        }
+        setLoadStatus('success')
+      })
+      .catch(err => {
+        setLoadStatus('fail')
+      })
+  }
+
   return (
     <View style={{ flex: 1 }}>
-      <Header nameHeader="Danh sách công việc" />
-
-      <View style={styles.body}>
-        {infoSlice.InfoList.money === undefined ||
-        infoSlice === null ||
-        infoSlice === undefined ? (
-          <View style={{ marginTop: 10 }}>
-            <Text style={styles.text}>Bạn hiện tại chưa có công việc nào!</Text>
-          </View>
-        ) : (
-          <Pressable
-            onPress={() => {
-              Alert.alert('hello')
-            }}
-            style={({ pressed }) => [
-              { backgroundColor: '#fff', opacity: pressed ? 0.2 : 1 }
-            ]}
-          >
-            <View style={styles.viewBox}>
-              {/* firstViewBox */}
-
-              <View
-                style={[
-                  styles.firstViewBox,
-                  {
-                    marginTop: 15,
-                    marginLeft: 15,
-                    marginRight: 15
-                  }
-                ]}
-              >
-                <View style={styles.itemFirstViewBox}>
-                  <View>
-                    <Text style={styles.text}>Dọn dẹp nhà</Text>
-                  </View>
-                  <View style={{}}>
-                    <View style={{ paddingTop: 5 }}>
-                      <Text style={[styles.subText, {}]}>
-                        Đã đăng vài giây tới
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={styles.button}>
-                  <Text
-                    style={[
-                      styles.subText,
-                      { color: bTaskee, textAlign: 'center' }
-                    ]}
-                  >
-                    Mới đăng
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.lineBox} />
-
-              <View style={styles.flexItem}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View style={styles.center}>
-                    <Icon
-                      name={'clipboard-outline'}
-                      fill={bTaskee}
-                      width={22}
-                      height={22}
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.contentText}>
-                      {formatLetter(timeSlice?.TimeList?.date)},
-                      {timeSlice?.TimeList?.day}
-                    </Text>
-                  </View>
-                </View>
-                {/* Item 2 */}
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <View>
-                    <Icon
-                      name={'clock-outline'}
-                      fill={bTaskee}
-                      width={22}
-                      height={22}
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.contentText}>
-                      {LIST_DATA3?.[mutiSlice.index]?.id !== -1 ? (
-                        <Text style={styles.contentText}>
-                          {LIST_DATA3?.[mutiSlice?.index]?.time} giờ,
-                          <Text style={styles.contentText}> Bắt đầu từ </Text>
-                          <Text style={styles.contentText}>
-                            {current.hour?.().toString().padStart(2, '')} :
-                          </Text>
-                          <Text style={styles.contentText}>
-                            {current.minutes?.()}
-                            <Text style={styles.contentText}>
-                              {' '}
-                              cho đến{' '}
-                              {current.hour?.() +
-                                LIST_DATA3?.[mutiSlice?.index]?.time}{' '}
-                              {':'} {current.minutes?.()}
-                            </Text>
-                          </Text>
-                        </Text>
-                      ) : null}
-                    </Text>
-                  </View>
-                </View>
-                {/* Item 3 */}
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <View>
-                    <Icon
-                      name={'smiling-face-outline'}
-                      fill={bTaskee}
-                      width={22}
-                      height={22}
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.contentText}>
-                      {currencyFormat(infoSlice?.InfoList?.money)}
-                    </Text>
-                  </View>
-                </View>
-                {/* Item 4 */}
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <View>
-                    <Icon
-                      name={'car-outline'}
-                      fill={bTaskee}
-                      width={22}
-                      height={22}
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.contentText}>Chờ thanh toán</Text>
-                  </View>
-                </View>
-                {/* Item 5 */}
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <View>
-                    <Icon
-                      name={'pin-outline'}
-                      fill={bTaskee}
-                      width={22}
-                      height={22}
-                    />
-                  </View>
-                  <View style={{ paddingRight: 20 }}>
-                    <Text
-                      style={[styles.contentText, { width: 300 }]}
-                      numberOfLines={3}
-                    >
-                      Công ty TNHH bTaskee, Hẻm 284/25 Lý Thường Kiệt, phường
-                      14, Quận 10, Thành phố Hồ Chí Minh, Việt Nam
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.lineBox} />
-              <View
-                style={[
-                  styles.firstViewBox,
-                  { marginTop: 20, marginLeft: 20, marginRight: 20 }
-                ]}
-              >
-                <View style={styles.button1}>
-                  <Text style={[styles.subText, { color: 'red' }]}>
-                    Hủy Việc
-                  </Text>
-                </View>
-                <View style={[styles.button2, {}]}>
-                  <Text style={[styles.subText, { color: 'green' }]}>
-                    Thanh Toán Lại
-                  </Text>
-                </View>
-              </View>
-
-              <View
-                style={[styles.center, { paddingTop: 20, paddingBottom: 20 }]}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: 14,
-                    color: '#98eba8'
-                  }}
-                >
-                  Các CTV bTaskee đều có ít nhất 1 mũi vaccine
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-        )}
-      </View>
+      <Header nameHeader="Chuyển đổi ngoại tệ" />
     </View>
   )
 }
-export default memo(DetailScreen)
+export default CurrencyScreen
 
 const styles = StyleSheet.create({
   viewBox: {

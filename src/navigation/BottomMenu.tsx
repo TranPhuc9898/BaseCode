@@ -18,14 +18,12 @@ import { createStackNavigator } from '@react-navigation/stack'
 import InputScreen from '@/screens/input/InputScreen'
 
 import HomeScreen from '../screens/home'
-import ChoiceScreen from '@/screens/choice'
-import { View } from 'react-native'
+import CurrencyScreen from '../screens/detail'
 
 export type HomeTabParams = {
   HomeScreen: undefined
-  AccountScreen: undefined
-  SupportScreen: undefined
-  DetailScreen: undefined
+
+  CurrencyScreen: undefined
 }
 
 export const BottomMenu = () => {
@@ -43,24 +41,12 @@ export const BottomMenu = () => {
       />
 
       <Tab.Screen
-        name={'DetailScreen'}
-        component={DetailScreen}
+        name={'CurrencyScreen'}
+        component={CurrencyScreen}
         options={{
           tabBarLabel: 'Currency Converter',
           headerShown: false,
           tabBarTestID: 'Currency Converter'
-        }}
-      />
-
-      <Tab.Screen
-        name="AccountScreen"
-        component={AccountScreen}
-        options={{
-          tabBarLabel: 'Feedback',
-
-          tabBarBadge: 3,
-          headerShown: false,
-          tabBarTestID: 'Feedback'
         }}
       />
     </Tab.Navigator>
@@ -69,11 +55,6 @@ export const BottomMenu = () => {
 
 export type RootStackParams = {
   BottomMenu: undefined
-
-  CleanHouseScreen: undefined
-  InputScreen: undefined
-  ChoiceScreen: undefined
-  DetailScreen: undefined
 }
 
 const Stack = createStackNavigator<RootStackParams>()
@@ -84,26 +65,6 @@ const AppNavigation = () => {
       <Stack.Screen
         name={'BottomMenu'}
         component={BottomMenu}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={'CleanHouseScreen'}
-        component={CleanHouseScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={'InputScreen'}
-        component={InputScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={'ChoiceScreen'}
-        component={ChoiceScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={'DetailScreen'}
-        component={DetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
