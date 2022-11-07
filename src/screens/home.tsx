@@ -25,10 +25,10 @@ import { IData2 } from '../utils/types'
 const { width, height } = Dimensions.get('window')
 const HomeScreen: React.FC<DrawerContentComponentProps> = ({ navigation }) => {
   useEffect(() => {
-    LogBox.ignoreLogs(['VirtualizedLists should never be nested'])
+    console.log("hello")
   }, [])
   const onPress = () => {
-    navigation.navigate('AccountScreen')
+    navigation.navigate('AccountScreen'
   }
   const _renderItem = ({ item, index }: { item: IData; index: number }) => {
     return (
